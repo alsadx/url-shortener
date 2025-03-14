@@ -6,12 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// type Casher interface {
-// 	Set(longUrl, shortUrl string)
-// 	GetLongUrl(shortUrl string) string
-// 	GetShortUrl(longUrl string) string
-// }
-
 type Cache struct {
 	UrlAlias sync.Map
 	AliasUrl sync.Map
@@ -19,10 +13,8 @@ type Cache struct {
 	db        *gorm.DB
 }
 
-// singleton
 var (
 	cacheInstance *Cache
-	// cacheOnce     sync.Once
 	cacheMutex sync.Mutex
 )
 

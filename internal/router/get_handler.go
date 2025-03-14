@@ -10,11 +10,7 @@ import (
 func GetHandler(c *gin.Context, mem storage.Storage, alias string) {
 	// alias := c.Param("alias")
 
-	fmt.Println(alias)
-
 	longUrl, err := mem.GetUrl(alias)
-
-	fmt.Println(longUrl)
 
 	if err != nil {
 		c.JSON(404, gin.H{

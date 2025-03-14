@@ -1,7 +1,6 @@
 package router
 
 import (
-	"log"
 	"url-shortener/internal/service"
 	"url-shortener/internal/storage"
 
@@ -23,18 +22,14 @@ func PostHandler(c *gin.Context, mem storage.Storage, url string) {
 	}
 
 	alias = service.Shortener(url)
-	// убрать
-	log.Println(alias)
 
 	err := mem.SaveUrl(url, alias)
 	for err == storage.ErrAlreadyExists {
-		log.Println(err)
 		alias = service.Shortener(alias)
 		err = mem.SaveUrl(url, alias)
 	}
 
 	if err != nil {
-		log.Println(err)
 		c.JSON(500, gin.H{
 			"error": "failed to save URL",
 		})
