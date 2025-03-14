@@ -30,43 +30,29 @@ git clone https://github.com/alsadx/url-shortener.git
 cd url-shortener
 ```
 
+#### Настройка окружения
+В файле config/.env настройте переменные окружения:
+```
+DB_NAME=db_name
+DB_USER=user_name
+DB_PASSWORD=
+DB_HOST=localhost
+DB_PORT=5432
+```
+
 #### Настройка конфигурации
 В файле config/local.yaml настройте параметры:
 ```yaml
 storage: "inmemory" # "inmemory" or "postgres"
-db:
-  name: "db_name"
-  user: "user_name"
-  password: ""
-  host: "localhost"
-  port: "5432"
 http_server:
-  address: ":8080"
   timeout: 5s
   idle_timeout: 20s
 ```
 ##### Параметры конфигурации:
 - storage: Выбор типа хранилища (inmemory или postgres).
-- db: Настройки подключения к базе данных PostgreSQL (используются только при выборе postgres).
-    - name: Имя базы данных.
-    - user: Имя пользователя базы данных.
-    - password: Пароль пользователя базы данных.
-    - host: Хост базы данных.
-    - port: Порт базы данных.
 - http_server: Настройки HTTP-сервера.
-    - address: Адрес сервера (например, :8080).
     - timeout: Таймаут на чтение запроса и отправку ответа.
     - idle_timeout: Время жизни соединения с клиентом.
-
-#### Путь до файла конфигурации
-Не забудьте установить пусть до файла:
-```bash
-export CONFIG_PATH="path/to/config/local.yaml"
-```
-Проверить путь можно командой:
-```bash
-echo $CONFIG_PATH
-```
 
 #### Установка зависимостей
 ```bash
@@ -74,9 +60,9 @@ go mod download
 ```
 
 #### Создание билда
-Чтобы выполнить сборку, перейдите в директорию cmd/url-shortener и выполните команду: 
+Чтобы выполнить сборку, выполните команду, находясь в корневой папке: 
 ```bash
-go build
+go build -o url_shortener ./cmd/url_shortener/
 ```
 
 #### Запуск сервера

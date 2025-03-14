@@ -51,7 +51,7 @@ func main() {
 	r := gin.New()
 
 	server := &http.Server{
-		Addr:         cfg.HttpServer.Address,
+		Addr:         ":8080",
 		Handler:      r,
 		ReadTimeout:  cfg.HttpServer.Timeout,
 		WriteTimeout: cfg.HttpServer.Timeout,

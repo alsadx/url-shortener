@@ -1,0 +1,27 @@
+services:
+
+  postgres:
+    image: postgres:latest
+    container_name: db-container
+    ports:
+      - "5433:5432"
+    env_file:
+      - ../config/.env
+    networks:
+      - app_network
+
+  url_shortener:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: url_shortener
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

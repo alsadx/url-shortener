@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 )
 
 type DbInfo struct {
@@ -24,25 +25,26 @@ type HttpInfo struct {
 	
 type Config struct {
 	Storage string `yaml:"storage" env-default:"inmemory"`
-	DB DbInfo `yaml:"db" env-required:"false"`
 	HttpServer HttpInfo `yaml:"http_server"`
+	DB DbInfo 
 }
 
 func LoadConfig() (*Config, error) {
-	configPath := os.Getenv("CONFIG_PATH")
-	if configPath == "" {
-		return nil, fmt.Errorf("CONFIG_PATH is not set")
+	err := godotenv.Load("config/.env")
+	if err != nil {
+		return nil, fmt.Errorf("failed to load .env file: %s", err)
 	}
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("config file not found: %s", err)
-	}
-	
 	var cfg Config
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
+	if err := cleanenv.ReadConfig("config/local.yaml", &cfg); err != nil {
 		return nil, fmt.Errorf("failed to read config: %s", err)
 	}
 
-	return &cfg, nil
+	cfg.DB.Password = os.Getenv("DB_PASSWORD")
+	cfg.DB.Host = os.Getenv("DB_HOST")
+	cfg.DB.Port = os.Getenv("DB_PORT")
+	cfg.DB.Name = os.Getenv("DB_NAME")
+	cfg.DB.User = os.Getenv("DB_USER")
 
+	return &cfg, nil
 }
