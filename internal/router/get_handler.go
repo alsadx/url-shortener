@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"url-shortener/internal/storage"
 
 	"github.com/gin-gonic/gin"
