@@ -13,26 +13,6 @@ type Request struct {
 }
 
 func PostHandler(c *gin.Context, mem storage.Storage, url string) {
-	// body, err := io.ReadAll(c.Request.Body)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	c.JSON(400, gin.H{
-	// 		"error": "invalid request body",
-	// 	})
-	// 	return
-	// }
-
-	// req := Request{}
-
-	// err = json.Unmarshal(body, &req)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	c.JSON(400, gin.H{
-	// 		"error": "invalid request body",
-	// 	})
-	// 	return
-	// }
-
 	// проверка url в памяти
 	alias, exists := mem.CheckUrl(url)
 	if exists {

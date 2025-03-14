@@ -1,4 +1,4 @@
-storage: "postgres" # "inmemory" or "postgres"
+storage: "inmemory" # "inmemory" or "postgres"
 db:
   name: "url_db"
   user: "alinasad"

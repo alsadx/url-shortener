@@ -9,8 +9,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type DBInterface interface {
+    Create(value interface{}) *gorm.DB
+    Where(query interface{}, args ...interface{}) *gorm.DB
+    First(out interface{}, where ...interface{}) *gorm.DB
+}
+
 type PostgreStorage struct {
-	db    *gorm.DB
+	db    DBInterface
 	cache *Cache
 }
 
@@ -35,7 +41,7 @@ func DbConnect(info *config.DbInfo) (*gorm.DB, error) {
 	return db, nil
 }
 
-func NewPostgreStorage(db *gorm.DB, cache *Cache) *PostgreStorage {
+func NewPostgreStorage(db DBInterface, cache *Cache) *PostgreStorage {
 	return &PostgreStorage{
 		db:    db,
 		cache: cache,
@@ -82,12 +88,9 @@ func (p *PostgreStorage) GetUrl(alias string) (string, error) {
 		return val, nil
 	}
 
-	fmt.Println("-----------\n", alias)
-
 	// проверка в бд
 	urlData := UrlData{}
 	result := p.db.Where("alias = ?", alias).First(&urlData)
-	fmt.Println("-----------\n", urlData.Url, urlData.Alias)
 	if result.Error != nil {
 		return "", fmt.Errorf("not found")
 	}
