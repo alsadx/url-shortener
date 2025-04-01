@@ -1,12 +1,11 @@
 services:
-
   postgres:
     image: postgres:latest
     container_name: db-container
     ports:
       - "5433:5432"
     env_file:
-      - ../config/.env
+      - /.env
     networks:
       - app_network
 

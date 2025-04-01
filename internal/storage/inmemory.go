@@ -48,3 +48,5 @@ func (m *MemoryStorage) GetUrl(alias string) (string, error) {
 
 	return "", fmt.Errorf("not found")
 }
+
+func (m *MemoryStorage) Close() {}

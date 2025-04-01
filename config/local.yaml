@@ -1,4 +1,0 @@
-storage: "postgres" # "inmemory" or "postgres"
-http_server:
-  timeout: 5s
-  idle_timeout: 60s

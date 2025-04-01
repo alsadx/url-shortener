@@ -1,42 +1,66 @@
 package storage
 
 import (
+	"fmt"
 	"sync"
 
-	"gorm.io/gorm"
+	"context"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Cache struct {
 	UrlAlias sync.Map
 	AliasUrl sync.Map
-	once      sync.Once
-	db        *gorm.DB
+	once     sync.Once
+	dbPool   *pgxpool.Pool
 }
 
 var (
 	cacheInstance *Cache
-	cacheMutex sync.Mutex
+	cacheMutex    sync.Mutex
 )
 
-func GetCache(db *gorm.DB) *Cache {
+func GetCache(pool *pgxpool.Pool) *Cache {
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
 
 	if cacheInstance == nil {
-		cacheInstance = &Cache{db: db}
+		cacheInstance = &Cache{dbPool: pool}
 		cacheInstance.loadFromDB()
 	}
 	return cacheInstance
 }
 
-func (c *Cache) loadFromDB() {
-	urls := []UrlData{}
-	c.db.Find(&urls)
+func (c *Cache) loadFromDB() error {
+	// urls := []UrlData{}
+	// c.db.Find(&urls)
 
-	for _, url := range urls {
-		c.AliasUrl.Store(url.Alias, url.Url)
-		c.UrlAlias.Store(url.Url, url.Alias)
+	// for _, url := range urls {
+	// 	c.AliasUrl.Store(url.Alias, url.Url)
+	// 	c.UrlAlias.Store(url.Url, url.Alias)
+	// }
+
+	rows, err := c.dbPool.Query(context.Background(), "SELECT alias, url FROM urls")
+	if err != nil {
+		return fmt.Errorf("query failed: %w", err)
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+        var shortURL, longURL string
+        if err := rows.Scan(&shortURL, &longURL); err != nil {
+            return fmt.Errorf("scan failed: %w", err)
+        }
+        c.AliasUrl.Store(shortURL, longURL)
+		c.UrlAlias.Store(longURL, shortURL)
+    }
+
+    if err := rows.Err(); err != nil {
+        return fmt.Errorf("rows iteration failed: %w", err)
+    }
+
+	return nil
 }
 
 func (c *Cache) Set(url, alias string) {
