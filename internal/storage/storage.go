@@ -10,34 +10,29 @@ type Storage interface {
 	SaveUrl(longUrl, shortUrl string) error
 	GetUrl(shortUrl string) (string, error)
 	CheckUrl(longUrl string) (string, bool)
-	Close()
 }
 
 var (
 	ErrAlreadyExists = errors.New("URL already exists")
+	ErrDBConnection  = errors.New("database connection error")
 )
 
-func InitStorage(cfg *config.Config) (Storage, error) {
+func NewStorage(cfg *config.Config) (Storage, error) {
 	var mem Storage
 	switch cfg.Storage {
 	case "inmemory":
 		mem = NewMemoryStorage()
 
 	case "postgres":
-		pool, err := InitDbPool(&cfg.DB)
+		db, err := DbConnect(&cfg.DB)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to connect to database: %s", err)
 		}
-		// defer pool.Close()
-		cache := GetCache(pool)
-		mem = NewPostgreStorage(pool, cache)
-		err = CheckTable(pool)
-		if err != nil {
-			return nil, err
-		}
+		cache := GetCache(db)
+		mem = NewPostgreStorage(db, cache)
 
 	default:
-		return nil, fmt.Errorf("unknown storage type %s", cfg.Storage)
+		return nil, fmt.Errorf("unknown storage type: %s", cfg.Storage)
 	}
 
 	return mem, nil

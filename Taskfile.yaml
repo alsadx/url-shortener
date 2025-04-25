@@ -1,0 +1,14 @@
+version: 3
+
+tasks:
+  run:
+    desc: "Run the server"
+    cmds:
+      - go run cmd/url_shortener/main.go
+
+
+#   migrate:
+#     desc: "Apply database migrations"
+#     cmds:
+#       - go run ./cmd/migrator/main.go
+
