@@ -8,9 +8,18 @@ import (
 )
 
 type Config struct {
-	Env         string `yaml:"env" env-default:"local"`
-	StoragePath string `yaml:"storage_path" env-required:"true"`
-	HTTPServer  `yaml:"http_server"`
+	Env        string `yaml:"env" env-default:"local"`
+	Storage    `yaml:"postgres" env-required:"true"`
+	HTTPServer `yaml:"http_server"`
+}
+
+type Storage struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Database string `yaml:"database"`
+	MaxConn  int32  `yaml:"max_conn"`
 }
 
 type HTTPServer struct {
@@ -32,7 +41,7 @@ func MustLoad() *Config {
 	var cfg Config
 
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		log.Fatalf("cannot read config", err)
+		log.Fatalf("cannot read config: %s", err)
 	}
 
 	return &cfg
