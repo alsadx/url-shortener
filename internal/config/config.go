@@ -19,7 +19,7 @@ type Storage struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 	Database string `yaml:"database"`
-	MaxConn  int32  `yaml:"max_conn"`
+	MaxConn  int32  `yaml:"max_conn" default:"10"`
 }
 
 type HTTPServer struct {

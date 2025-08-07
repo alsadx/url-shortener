@@ -30,7 +30,6 @@ func main() {
 	// Формируем строку подключения
 	dbURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&x-migrations-table=%s",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database, migrationsTable)
-	log.Printf("Connecting to database with URL: %s", dbURL)
 
 	m, err := migrate.New("file://"+migrationsPath, dbURL)
 	if err != nil {
