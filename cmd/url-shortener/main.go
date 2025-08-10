@@ -61,10 +61,10 @@ func main() {
 
 	router.Get("/{alias}", redirect.New(log, storage))
 
-	log.Info("starting server", slog.String("address", cfg.Address))
+	log.Info("starting server", slog.String("address", cfg.HTTPServer.Address))
 
 	srv := &http.Server{
-		Addr:         cfg.Address,
+		Addr:         cfg.HTTPServer.Address,
 		Handler:      router,
 		ReadTimeout:  cfg.HTTPServer.Timeout,
 		WriteTimeout: cfg.HTTPServer.Timeout,
