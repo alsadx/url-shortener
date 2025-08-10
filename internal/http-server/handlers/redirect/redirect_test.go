@@ -41,7 +41,7 @@ func TestSaveHandler(t *testing.T) {
 			}
 
 			r := chi.NewRouter()
-			log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+			log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}))
 
 			r.Get("/{alias}", redirect.New(log, urlGetterMock))
 

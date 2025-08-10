@@ -20,40 +20,46 @@ import (
 
 func TestSaveHandler(t *testing.T) {
 	cases := []struct {
-		name      string
-		alias     string
-		url       string
-		respError string
-		mockError error
+		name         string
+		alias        string
+		url          string
+		expectedCode int
+		respError    string
+		mockError    error
 	}{
 		{
-			name:  "Success",
-			alias: "test_alias",
-			url:   "https://google.com",
+			name:         "Success",
+			alias:        "test_alias",
+			url:          "https://google.com",
+			expectedCode: http.StatusOK,
 		},
 		{
-			name:  "Empty alias",
-			alias: "",
-			url:   "https://google.com",
+			name:         "Empty alias",
+			alias:        "",
+			url:          "https://google.com",
+			expectedCode: http.StatusOK,
 		},
 		{
-			name:      "Empty URL",
-			url:       "",
-			alias:     "some_alias",
-			respError: "URL is required",
+			name:         "Empty URL",
+			url:          "",
+			alias:        "some_alias",
+			expectedCode: http.StatusBadRequest,
+			respError:    "URL is required",
 		},
 		{
-			name:      "Invalid URL",
-			url:       "some invalid URL",
-			alias:     "some_alias",
-			respError: "URL is not a valid URL",
+			name:         "Invalid URL",
+			url:          "some invalid URL",
+			alias:        "some_alias",
+			expectedCode: http.StatusBadRequest,
+			respError:    "URL is not a valid URL",
 		},
 		{
-			name:      "SaveURL Error",
-			alias:     "test_alias",
-			url:       "https://google.com",
-			respError: "failed to save url",
-			mockError: errors.New("unexpected error"),
+			name:         "SaveURL Error",
+			alias:        "test_alias",
+			url:          "https://google.com",
+			expectedCode: http.StatusInternalServerError,
+			respError:    "failed to save url",
+			mockError:    errors.New("unexpected error"),
 		},
 	}
 
@@ -71,7 +77,7 @@ func TestSaveHandler(t *testing.T) {
 					Once()
 			}
 
-			log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+			log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}))
 
 			handler := save.New(log, urlSaverMock)
 
@@ -83,7 +89,7 @@ func TestSaveHandler(t *testing.T) {
 			rr := httptest.NewRecorder()
 			handler.ServeHTTP(rr, req)
 
-			require.Equal(t, rr.Code, http.StatusOK)
+			require.Equal(t, rr.Code, tc.expectedCode)
 
 			body := rr.Body.String()
 

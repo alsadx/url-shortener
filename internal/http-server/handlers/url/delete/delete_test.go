@@ -63,7 +63,7 @@ func TestDeleteHandler(t *testing.T) {
 			}
 
 			r := chi.NewRouter()
-			log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+			log := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}))
 
 			r.Delete("/{alias}", delete.New(log, urlDeleterMock))
 
