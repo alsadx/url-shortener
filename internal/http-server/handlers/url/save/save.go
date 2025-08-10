@@ -3,6 +3,7 @@ package save
 import (
 	"context"
 	"errors"
+	"io"
 	"log/slog"
 	"net/http"
 
@@ -45,8 +46,17 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
+			if errors.Is(err, io.EOF) {
+				log.Error("request body is empty")
+
+				w.WriteHeader(http.StatusBadRequest)
+				render.JSON(w, r, resp.Error("empty request"))
+
+				return
+			}
 			log.Error("failed to decode request", slog.String("error", err.Error()))
 
+			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("failed to decode request"))
 
 			return
@@ -59,6 +69,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 
 			log.Error("invalid request", slog.String("error", err.Error()))
 
+			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.ValidationError(validateErr))
 
 			return
@@ -70,6 +81,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			if err != nil {
 				log.Error("failed to generate alias", slog.String("error", err.Error()))
 
+				w.WriteHeader(http.StatusInternalServerError)
 				render.JSON(w, r, resp.Error("failed to generate alias"))
 
 				return
@@ -80,6 +92,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		if errors.Is(err, storage.ErrURLExists) {
 			log.Info("url already exists", slog.String("url", req.URL))
 
+			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("url already exists"))
 
 			return
@@ -87,6 +100,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		if err != nil {
 			log.Error("failed to save url", slog.String("error", err.Error()))
 
+			w.WriteHeader(http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("failed to save url"))
 
 			return
